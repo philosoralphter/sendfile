@@ -1,21 +1,38 @@
 #!/usr/bin/env node
 console.log('the command is working');
-console.log('args: ', process.argv );
-console.log(__dirname);
 
-var socket = require('net');
+var netModule = require('net');
 var ip = require('ip');
 
-var server = socket.createServer(function(connection){
-  console.log('server connected to client');
+var thisIP = 'localhost';//ip.address();
+var port = 7657;
+var fileToSend = process.argv[2];
+var authentication = process.argv[3];
+console.log(': ', ip.address() );
 
-  connection.on('end', function() {
-    console.log('server disconnected');
+console.log('ip: ', thisIP );
+
+var server = netModule.createServer(function(socketConnection){
+  //Kill Socket after 5 second inactivity
+  //socketConnection.timeout(5000, function(){socketConnection.destroy();});
+  //LOGS
+  console.log('server connected to client');
+  socketConnection.write('You have connected to '+thisIP);
+
+  socketConnection.on('data', function(data){
+    console.log(data.toString());
   });
-  connection.write('hello!');
-  connection.pipe(connection);
+
+  socketConnection.on('end', function() {
+    console.log('Client disconnected from server.');
+  });
+
+
+  
+
+  socketConnection.pipe(socketConnection);
 });
 
-server.listen(7000, function(){
-  console.log('server socket initiated')
+server.listen(port, thisIP, function(){
+  console.log('Server initiated socket. Listening on port: '+port+' at address: '+ thisIP)
 });
