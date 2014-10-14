@@ -9,7 +9,6 @@ var hostIP = 'localhost';//process.argv[2];
 var PORT = 7657;
 var antennaLife = 10000;
 
-var destination = __dirname;
 var fileName;
 
 //-----------
@@ -32,22 +31,27 @@ antennaSocket.bind(PORT, function listening (){
   antennaSocket.on('message', function (msg, envelope){
     hostIP = envelope.address;
     fileName = msg.toString();
+
+    //send Response
+    var response = new Buffer('Client Receiving');
+    antennaSocket.send(response, 0, response.length, PORT, hostIP);
+
     console.log('Receiving Broadcast from: ', hostIP);
     antennaSocket.close();
     clearTimeout(timeout);
 
-    console.log('Beginning transfer of file:', fileName);
+    console.log('Connecting to '+hostIP+' to get file:', fileName);
     setTimeout(beginTransfer, 2000);
   });
 
   //stop listening after 10 seconds 
   var timeout = setTimeout(function(){
+    console.log( 'No Broadcast detected.' );
     killAntenna();
     process.exit(1);
   }, antennaLife);
 
   killAntenna = function (){
-    console.log( 'No Broadcast detected.' );
     clearTimeout(timeout);
     process.exit(1);
   };
@@ -59,14 +63,13 @@ antennaSocket.bind(PORT, function listening (){
 //----------------
 
 function beginTransfer() {
-  console.log('Client beginning transfer from: ', hostIP );
 
   var socketConnection = new netModule.Socket();
 
   socketConnection.connect(PORT, hostIP, function connected(){
     //----------Config and handshake-------------------------------
     //Kill Socket after 5 seconds inactivity
-    socketConnection.setTimeout(5000, function(){
+    socketConnection.setTimeout(10000, function(){
       console.log('Socket Timeout');
       socketConnection.destroy();
       process.exit(1);
@@ -78,13 +81,15 @@ function beginTransfer() {
 
 
     //-----------Receive data and write to file in current directory-------------
-    var writeStream = fs.createWriteStream(destination + fileName);
+    var writeStream = fs.createWriteStream(fileName);
     socketConnection.on('data', function(chunk){
       writeStream.write(chunk);
     });
-    writeStream.on('finish', function(){
+
+    socketConnection.on('end', function(){
       console.log('File Received');
-      socketConnection.end();
+      console.log('Closing Connection');
+      writeStream.end();
       socketConnection.destroy();
     });
 

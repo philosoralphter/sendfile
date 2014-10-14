@@ -18,7 +18,7 @@ var authentication = process.argv[3];
 var broadcaster = dgram.createSocket('udp4');
 var broadcastMessage = new Buffer(fileToSend.toString());
 var broadcastInterval = 1000;
-var broadcastLife = 10000;
+var broadcastLife = 20000;
 var broadcastTTL = 40;
 
 //Initiate Broadcast
@@ -71,10 +71,12 @@ var server = netModule.createServer();
 
 //************Socket Connection handler
 server.on('connection', function(socketConnection){
+
+  killBroadcast();
   
   //----------Config-------------------------------
   //Kill Socket after 5 second inactivity
-  socketConnection.setTimeout(5000, function(){
+  socketConnection.setTimeout(10000, function(){
     console.log('Socket Timeout');
     socketConnection.destroy();
     process.exit(1);
@@ -83,8 +85,9 @@ server.on('connection', function(socketConnection){
   //Logs
   console.log('Server connected to client');
   socketConnection.write('You have connected to '+thisIP);
-  socketConnection.on('end', function() {
+  socketConnection.on('close', function() {
     console.log('Server disconnected from client.');
+    process.exit(0);
   });
 
   //--------------Authentication-------------------
@@ -98,10 +101,11 @@ server.on('connection', function(socketConnection){
     readFile.on('data', function(chunk){
       socketConnection.write(chunk);
     });
-    readFile.on('finish', function(){
-      Console.log('File Sent');
+    readFile.on('end', function(){
+      console.log('File Sent');
       socketConnection.end();
       socketConnection.destroy();
+      process.exit(0);
     });    
   });
 
