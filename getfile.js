@@ -4,18 +4,20 @@ var dgram = require('dgram');   //for broadcast
 var ip = require('ip');  //ip utility
 var fs = require('fs');
 
-var destination = __dirname;
 var thisIP = ip.address();
 var hostIP = 'localhost';//process.argv[2];
 var PORT = 7657;
 var antennaLife = 10000;
 
+var destination = __dirname;
+var fileName;
+
 //-----------
 //*************Receive broadcast from server   (udp datagram socket)
 //----------------
-var antennaSocket = dgram.createSocket('udp4');
 
 //begin listening
+var antennaSocket = dgram.createSocket('udp4');
 antennaSocket.bind(PORT, function listening (){
 
   console.log('Listening for host Broadcast...');
@@ -27,16 +29,16 @@ antennaSocket.bind(PORT, function listening (){
     throw err;
   });
 
-
   antennaSocket.on('message', function (msg, envelope){
     hostIP = envelope.address;
-    console.log('host address found: ', envelope );
+    fileName = msg.toString();
     console.log('Receiving Broadcast from: ', hostIP);
     antennaSocket.close();
     clearTimeout(timeout);
+
+    console.log('Beginning transfer of file:', fileName);
     setTimeout(beginTransfer, 2000);
   });
-
 
   //stop listening after 10 seconds 
   var timeout = setTimeout(function(){
@@ -44,14 +46,11 @@ antennaSocket.bind(PORT, function listening (){
     process.exit(1);
   }, antennaLife);
 
-
   killAntenna = function (){
     console.log( 'No Broadcast detected.' );
     clearTimeout(timeout);
     process.exit(1);
   };
-
-
 });
 
 
@@ -66,7 +65,7 @@ function beginTransfer() {
 
   socketConnection.connect(PORT, hostIP, function connected(){
     //----------Config and handshake-------------------------------
-    //Kill Socket after 5 second inactivity
+    //Kill Socket after 5 seconds inactivity
     socketConnection.setTimeout(5000, function(){
       console.log('Socket Timeout');
       socketConnection.destroy();
@@ -79,10 +78,14 @@ function beginTransfer() {
 
 
     //-----------Receive data and write to file in current directory-------------
-    var writeStream = fs.createWriteStream(destination);
+    var writeStream = fs.createWriteStream(destination + fileName);
     socketConnection.on('data', function(chunk){
-      // console.log( data.toString() );
       writeStream.write(chunk);
+    });
+    writeStream.on('finish', function(){
+      console.log('File Received');
+      socketConnection.end();
+      socketConnection.destroy();
     });
 
   });

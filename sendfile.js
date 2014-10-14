@@ -16,22 +16,23 @@ var authentication = process.argv[3];
 //*************Broadcast intent and location   (udp datagram socket)
 //---------------
 var broadcaster = dgram.createSocket('udp4');
-var broadcastMessage = new Buffer('Server: broadcasting.');
+var broadcastMessage = new Buffer(fileToSend.toString());
 var broadcastInterval = 1000;
 var broadcastLife = 10000;
 var broadcastTTL = 40;
 
 //Initiate Broadcast
 broadcaster.bind(PORT, function Broadcast(){
+
   //configure broadcast
+  console.log('Initiating broadcast');
   broadcaster.setTTL(broadcastTTL);
   broadcaster.setBroadcast(1);
-  console.log('initiating broadcast ');
   
   var sendBroadcast = function (){
     broadcaster.send( broadcastMessage, 0, broadcastMessage.length, PORT, '255.255.255.255',function(err, bytes){
       if (err) {console.log(err);};
-      //console.log('broadcasting ');
+
     });
   };
   var broadcastInterval = setInterval (sendBroadcast , broadcastInterval );
@@ -89,16 +90,20 @@ server.on('connection', function(socketConnection){
   //--------------Authentication-------------------
 
 
-  //-------Receive client messages--------
+  //-------Send File and Receive client messages--------
   socketConnection.on('data', function(data){
     console.log(data.toString());
     //Send File
-    fs.createReadStream(fileToSend).on('data', function(chunk){
+    var readFile = fs.createReadStream(fileToSend);
+    readFile.on('data', function(chunk){
       socketConnection.write(chunk);
     });
-    
+    readFile.on('finish', function(){
+      Console.log('File Sent');
+      socketConnection.end();
+      socketConnection.destroy();
+    });    
   });
-
 
 });
 
