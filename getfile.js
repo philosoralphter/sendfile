@@ -11,16 +11,19 @@ var PORT = 7657;
 var socketConnection = new netModule.Socket();
 
 socketConnection.connect(PORT, hostIP, function(){
+  //----------Config and handshake-------------------------------
   //Kill Socket after 5 second inactivity
   //socketConnection.timeout(5000, function(){socketConnection.destroy();});
+  socketConnection.write('Client at: '+thisIP+' confirms connection.');
+  console.log(socketConnection.localAddress);
   
-  //confirm connection
-  socketConnection.write('Client at: '+thisIP+' confirms connection');
+  //--------------Authentication---------------------------
 
+
+  //-----------Receive data and write to file in current directory-------------
   socketConnection.on('data', function(data){
     console.log(data.toString());
   });
-  console.log(received);
 
 });
 
