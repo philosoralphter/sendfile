@@ -30,13 +30,12 @@ antennaSocket.bind(PORT, function listening (){
   });
 
   //stop listening after 10 seconds
-  var killBroadcast = function (){
-    clearInterval(broadcastInterval);
-    console.log('Broadcast Unaswered:' );
+  var killAntenna = function (){
+    console.log( 'No Broadcast detected.' );
     process.exit(1);
   };
 
-  setTimeout(killBroadcast, antennaLife);
+  setTimeout(killAntenna, antennaLife);
 
 });
 
