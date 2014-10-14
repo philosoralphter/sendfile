@@ -93,7 +93,10 @@ server.on('connection', function(socketConnection){
   socketConnection.on('data', function(data){
     console.log(data.toString());
     //Send File
-    socketConnection.write(fs.createReadStream(fileToSend)); 
+    fs.createReadStream(fileToSend).on('data', function(chunk){
+      socketConnection.write(chunk);
+    });
+    
   });
 
 

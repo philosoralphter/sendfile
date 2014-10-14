@@ -79,10 +79,10 @@ function beginTransfer() {
 
 
     //-----------Receive data and write to file in current directory-------------
-    socketConnection.on('data', function(data){
+    var writeStream = fs.createWriteStream(destination);
+    socketConnection.on('data', function(chunk){
       // console.log( data.toString() );
-      var destFileStream = fs.createWriteStream(destination);
-      destFileStream.write(data);
+      writeStream.write(chunk);
     });
 
   });
