@@ -2,10 +2,10 @@
 var dgram = require('dgram');
 var netModule = require('net');
 var ip = require('ip');
+var fs = require('fs');
 
 var thisIP = ip.address();
 var PORT = 7657;
-var broadcastTTL = 2;
 
 //Parse arguments
 var fileToSend = process.argv[2];
@@ -19,7 +19,7 @@ var broadcaster = dgram.createSocket('udp4');
 var broadcastMessage = new Buffer('Server: broadcasting.');
 var broadcastInterval = 1000;
 var broadcastLife = 10000;
-var broadcastTTL = 5;
+var broadcastTTL = 40;
 
 //Initiate Broadcast
 broadcaster.bind(PORT, function Broadcast(){
@@ -29,16 +29,16 @@ broadcaster.bind(PORT, function Broadcast(){
   console.log('initiating broadcast ');
   
   var sendBroadcast = function (){
-    broadcaster.send( broadcastMessage, 0, broadcastMessage.length, PORT, '',function(err, bytes){
+    broadcaster.send( broadcastMessage, 0, broadcastMessage.length, PORT, '255.255.255.255',function(err, bytes){
       if (err) {console.log(err);};
-      console.log('broadcasting ');
+      //console.log('broadcasting ');
     });
   };
   var broadcastInterval = setInterval (sendBroadcast , broadcastInterval );
   
   //Listen for Response and kill broadcast if heard, begin file transfer
   broadcaster.on('message', function (msg, envelope){
-    if (envelope.address !== thisIP){
+    if (envelope.address !== thisIP && envelope.address !== '127.0.0.1'){
       console.log('Broadcast answered by: '+ envelope.address);
       killBroadcast();
     }
@@ -46,7 +46,7 @@ broadcaster.bind(PORT, function Broadcast(){
 
 
   var timeout = setTimeout(function(){
-    console.log('Broadcast Unaswered' );
+    console.log('Broadcast Unanswered' );
     killBroadcast();
     process.exit(1);
   }, broadcastLife);
@@ -92,7 +92,10 @@ server.on('connection', function(socketConnection){
   //-------Receive client messages--------
   socketConnection.on('data', function(data){
     console.log(data.toString());
+    //Send File
+    socketConnection.write(fs.createReadStream(fileToSend)); 
   });
+
 
 });
 

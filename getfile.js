@@ -2,6 +2,7 @@
 var netModule = require('net');  //for streaming socket
 var dgram = require('dgram');   //for broadcast
 var ip = require('ip');  //ip utility
+var fs = require('fs');
 
 var destination = __dirname;
 var thisIP = ip.address();
@@ -39,7 +40,6 @@ antennaSocket.bind(PORT, function listening (){
 
   //stop listening after 10 seconds 
   var timeout = setTimeout(function(){
-    console.log('Broadcast Unaswered' );
     killAntenna();
     process.exit(1);
   }, antennaLife);
@@ -80,7 +80,9 @@ function beginTransfer() {
 
     //-----------Receive data and write to file in current directory-------------
     socketConnection.on('data', function(data){
-      console.log( data.toString() );
+      // console.log( data.toString() );
+      var destFileStream = fs.createWriteStream(destination);
+      destFileStream.write(data);
     });
 
   });
