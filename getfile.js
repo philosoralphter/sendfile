@@ -29,6 +29,7 @@ antennaSocket.bind(PORT, function listening (){
 
   antennaSocket.on('message', function (msg, envelope){
     hostIP = envelope.address;
+    console.log('host address found: ', envelope );
     console.log('Receiving Broadcast from: ', hostIP);
     antennaSocket.close();
     clearTimeout(timeout);
@@ -55,7 +56,7 @@ antennaSocket.bind(PORT, function listening (){
 
 
 //-----------
-//*************Initiate transfer
+//*************Connect to server, Initiate transfer
 //----------------
 
 function beginTransfer() {

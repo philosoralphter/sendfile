@@ -70,7 +70,8 @@ var server = netModule.createServer();
 
 //************Socket Connection handler
 server.on('connection', function(socketConnection){
-  //----------Config and handshake-------------------------------
+  
+  //----------Config-------------------------------
   //Kill Socket after 5 second inactivity
   socketConnection.setTimeout(5000, function(){
     console.log('Socket Timeout');
@@ -78,10 +79,9 @@ server.on('connection', function(socketConnection){
     process.exit(1);
   });
   
-  //LOGS
+  //Logs
   console.log('Server connected to client');
   socketConnection.write('You have connected to '+thisIP);
-  
   socketConnection.on('end', function() {
     console.log('Server disconnected from client.');
   });
@@ -99,6 +99,6 @@ server.on('connection', function(socketConnection){
 
 //----------------Start Server
 server.listen(PORT, thisIP, function(){
-  console.log('Iitiating server. Listening on PORT: '+PORT+' at address: '+ thisIP)
+  console.log('Initiating server. Listening on PORT: '+PORT+' at address: '+ thisIP)
 });
 
