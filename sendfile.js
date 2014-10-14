@@ -34,12 +34,15 @@ server.on('connection', function(socketConnection){
     console.log(data.toString());
   });
 
-
-  //socketConnection.pipe(socketConnection);
 });
 
 
-//Start Server
+//----------------Start Server
 server.listen(port, thisIP, function(){
   console.log('Server initiated socket. Listening on port: '+port+' at address: '+ thisIP)
 });
+
+
+
+
+
