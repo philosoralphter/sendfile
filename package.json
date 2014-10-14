@@ -4,10 +4,10 @@
   "description": "zero-config CLI for sending files",
   "main": "index.js",
   "preferGlobal": "true",
-  "bin": { "sendfile": "sendfile.js" },
-  // "scripts": {
-  //   "test": "echo \"Error: no test specified\" && exit 1"
-  // },
+  "bin": {
+    "sendfile": "./sendfile.js",
+    "getfile": "./getfile.js"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/philosoralphter/2014-09-solo.git"
@@ -16,14 +16,15 @@
     "file",
     "transfer",
     "send",
-    "file",
-    "file",
-    "drop"
+    "share"
   ],
   "author": "Ralph Samuel <theralphsamuel@gmail.com> (http://ralphsamuel.io/)",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/philosoralphter/2014-09-solo/issues"
   },
-  "homepage": "https://github.com/philosoralphter/2014-09-solo"
+  "homepage": "https://github.com/philosoralphter/2014-09-solo",
+  "dependencies": {
+    "ip": "^0.3.2"
+  }
 }
