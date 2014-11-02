@@ -81,7 +81,7 @@ function beginTransfer() {
 
 
     //-----------Receive data and write to file in current directory-------------
-    var writeStream = fs.createWriteStream(fileName);
+    var writeStream = fs.createWriteStream(process.cwd() + fileName);
     socketConnection.on('data', function(chunk){
       writeStream.write(chunk);
     });

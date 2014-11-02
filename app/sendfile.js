@@ -9,6 +9,8 @@ var PORT = 7657;
 
 //Parse arguments
 var fileToSend = process.argv[2];
+var fileNameRegex = /[^/]+$/;
+var fileName = fileToSend.match(fileNameRegex)[0];
 var authentication = process.argv[3];
 
 
@@ -16,7 +18,7 @@ var authentication = process.argv[3];
 //*************Broadcast intent and location   (udp datagram socket)
 //---------------
 var broadcaster = dgram.createSocket('udp4');
-var broadcastMessage = new Buffer(fileToSend.toString());
+var broadcastMessage = new Buffer();
 var broadcastInterval = 1000;
 var broadcastLife = 15000;
 var broadcastTTL = 40;
