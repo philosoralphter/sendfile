@@ -5,7 +5,7 @@ var ip = require('ip');  //ip utility
 var fs = require('fs');
 
 var thisIP = ip.address();
-var hostIP = 'localhost';//process.argv[2];
+var hostIP;
 var PORT = 7657;
 var antennaLife = 15000;
 
@@ -59,7 +59,7 @@ antennaSocket.bind(PORT, function listening (){
 
 
 //-----------
-//*************Connect to server, Initiate transfer
+//*************Connect to server, Initiate transfer  (TCP Socket)
 //----------------
 
 function beginTransfer() {

@@ -15,15 +15,15 @@ var authentication = process.argv[3];
 
 
 //-------------------
-//*************Broadcast intent and location   (udp datagram socket)
+//*************Broadcast intent and location   (UDP datagram socket)
 //---------------
-var broadcaster = dgram.createSocket('udp4');
 var broadcastMessage = new Buffer();
 var broadcastInterval = 1000;
 var broadcastLife = 15000;
 var broadcastTTL = 40;
 
 //Initiate Broadcast
+var broadcaster = dgram.createSocket('udp4');
 broadcaster.bind(PORT, function Broadcast(){
 
   //configure broadcast
@@ -31,13 +31,9 @@ broadcaster.bind(PORT, function Broadcast(){
   broadcaster.setTTL(broadcastTTL);
   broadcaster.setBroadcast(1);
   
-  var sendBroadcast = function (){
-    broadcaster.send( broadcastMessage, 0, broadcastMessage.length, PORT, '255.255.255.255',function(err, bytes){
-      if (err) {console.log(err);};
-
-    });
-  };
+  //Begin broadcast interval
   var broadcastInterval = setInterval (sendBroadcast , broadcastInterval );
+  
   
   //Listen for Response and kill broadcast if heard, begin file transfer
   broadcaster.on('message', function (msg, envelope){
@@ -47,13 +43,20 @@ broadcaster.bind(PORT, function Broadcast(){
     }
   });
 
-
+  //Set timeout to stop listening after var broadcastLife
   var timeout = setTimeout(function(){
     console.log('Broadcast Unanswered' );
     killBroadcast();
     process.exit(1);
   }, broadcastLife);
   
+  sendBroadcast = function (){
+    broadcaster.send( broadcastMessage, 0, broadcastMessage.length, PORT, '255.255.255.255',function(err, bytes){
+      if (err) {console.log(err);};
+
+    });
+  };
+
   //kill broadcast
   killBroadcast = function (){
     clearInterval(broadcastInterval);
@@ -67,9 +70,9 @@ broadcaster.bind(PORT, function Broadcast(){
 
 
 //----------
-//************File Server**********************
+//************File Server**********************  (TCP Socket)
 //-----------------------
-var server = netModule.createServer();
+var server = netModule.createServer(); 
 
 //************Socket Connection handler
 server.on('connection', function(socketConnection){
