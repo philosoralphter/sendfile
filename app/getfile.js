@@ -7,7 +7,7 @@ var fs = require('fs');
 var thisIP = ip.address();
 var hostIP = 'localhost';//process.argv[2];
 var PORT = 7657;
-var antennaLife = 10000;
+var antennaLife = 15000;
 
 var fileName;
 

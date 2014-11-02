@@ -18,7 +18,7 @@ var authentication = process.argv[3];
 var broadcaster = dgram.createSocket('udp4');
 var broadcastMessage = new Buffer(fileToSend.toString());
 var broadcastInterval = 1000;
-var broadcastLife = 20000;
+var broadcastLife = 15000;
 var broadcastTTL = 40;
 
 //Initiate Broadcast
