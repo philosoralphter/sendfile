@@ -5,8 +5,8 @@
   "main": "index.js",
   "preferGlobal": "true",
   "bin": {
-    "sendfile": "./sendfile.js",
-    "getfile": "./getfile.js"
+    "sendfile": "./app/sendfile.js",
+    "getfile": "./app/getfile.js"
   },
   "repository": {
     "type": "git",
