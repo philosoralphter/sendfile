@@ -17,7 +17,7 @@ var authentication = process.argv[3];
 //-------------------
 //*************Broadcast intent and location   (UDP datagram socket)
 //---------------
-var broadcastMessage = new Buffer();
+var broadcastMessage = new Buffer(fileName.toString());
 var broadcastInterval = 1000;
 var broadcastLife = 15000;
 var broadcastTTL = 40;
@@ -50,7 +50,7 @@ broadcaster.bind(PORT, function Broadcast(){
     process.exit(1);
   }, broadcastLife);
   
-  sendBroadcast = function (){
+  function sendBroadcast(){
     broadcaster.send( broadcastMessage, 0, broadcastMessage.length, PORT, '255.255.255.255',function(err, bytes){
       if (err) {console.log(err);};
 
@@ -58,7 +58,7 @@ broadcaster.bind(PORT, function Broadcast(){
   };
 
   //kill broadcast
-  killBroadcast = function (){
+  function killBroadcast (){
     clearInterval(broadcastInterval);
     clearTimeout(timeout);
     broadcaster.close();
@@ -76,8 +76,6 @@ var server = netModule.createServer();
 
 //************Socket Connection handler
 server.on('connection', function(socketConnection){
-
-  killBroadcast();
   
   //----------Config-------------------------------
   //Kill Socket after 5 second inactivity
@@ -116,9 +114,9 @@ server.on('connection', function(socketConnection){
 
 });
 
+  //----------------Start Server
+  server.listen(PORT, thisIP, function(){
+    console.log('Initiating server. Listening on PORT: '+PORT+' at address: '+ thisIP)
+  }); 
 
-//----------------Start Server
-server.listen(PORT, thisIP, function(){
-  console.log('Initiating server. Listening on PORT: '+PORT+' at address: '+ thisIP)
-});
 
