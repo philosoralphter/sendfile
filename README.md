@@ -4,21 +4,21 @@ Sendfile is a zero-config command line tool for sending files between two comput
 
 ###Installation
 ```shell
-npm install -g sendfile
+$ npm install -g sendfile
 ```
 
 ###Usage
 In the shell on the source computer:
 
 ```shell
-sendfile <path-to-file>
+$ sendfile <path-to-file>
 ```
 
 
 And on the destination computer:
 
 ```shell
-getfile
+$ getfile
 ```
 
 ####Usage Notes
