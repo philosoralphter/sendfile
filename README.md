@@ -2,6 +2,11 @@
 ##Sendfile
 Sendfile is a zero-config command line tool for sending files between two computers on a network.
 
+###Installation
+```shell
+npm install -g sendfile
+```
+
 ###Usage
 In the shell on the source computer:
 
@@ -17,7 +22,9 @@ getfile
 ```
 
 ####Usage Notes
-The source path can be absolute or relative.  The destination path is the current working directory (`.`).
+Currently, senfile can only send single files.  To send a directory, zip it up!
+
+The source path can be absolute or relative.  The destination path is in the current working directory (`.`).
 
 It does not matter which computer executes its respective command first.  From the time one is executed, the other must be executed within fifteen seconds.
 
