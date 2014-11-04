@@ -22,7 +22,7 @@ $ getfile
 ```
 
 ####Usage Notes
-Currently, senfile can only send single files.  To send a directory, zip it up!
+Currently, sendfile can only send single files.  To send a directory, zip it up!
 
 The source path can be absolute or relative.  The destination path is in the current working directory (`.`).
 
