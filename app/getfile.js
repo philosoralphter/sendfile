@@ -11,51 +11,7 @@ var antennaLife = 15000;
 
 var fileName;
 
-//-----------
-//*************Receive broadcast from server   (udp datagram socket)
-//----------------
 
-//begin listening
-var antennaSocket = dgram.createSocket('udp4');
-antennaSocket.bind(PORT, function listening (){
-
-  console.log('Listening for host Broadcast...');
-
-  //Configure antenna
-  antennaSocket.on('error', function (err){
-    console.log('Failed to bind to broadcast socket');
-    antennaSocket.close();
-    throw err;
-  });
-
-  antennaSocket.on('message', function (msg, envelope){
-    hostIP = envelope.address;
-    fileName = msg.toString();
-
-    //send Response
-    var response = new Buffer('Client Receiving');
-    antennaSocket.send(response, 0, response.length, PORT, hostIP);
-
-    console.log('Receiving Broadcast from: ', hostIP);
-    antennaSocket.close();
-    clearTimeout(timeout);
-
-    console.log('Connecting to '+hostIP+' to get file:', fileName);
-    setTimeout(beginTransfer, 2000);
-  });
-
-  //stop listening after 10 seconds 
-  var timeout = setTimeout(function(){
-    console.log( 'No Broadcast detected.' );
-    killAntenna();
-    process.exit(1);
-  }, antennaLife);
-
-  killAntenna = function (){
-    clearTimeout(timeout);
-    process.exit(1);
-  };
-});
 
 
 //-----------

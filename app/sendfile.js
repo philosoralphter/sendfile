@@ -4,6 +4,9 @@ var netModule = require('net');
 var ip = require('ip');
 var fs = require('fs');
 
+var broadcaster = new require('./pairingService').Broadcaster();
+var constants = require('./constants');
+
 var thisIP = ip.address();
 var PORT = 7657;
 
@@ -17,53 +20,9 @@ var authentication = process.argv[3];
 //-------------------
 //*************Broadcast intent and location   (UDP datagram socket)
 //---------------
-var broadcastMessage = new Buffer(fileName.toString());
-var broadcastInterval = 1000;
-var broadcastLife = 15000;
-var broadcastTTL = 40;
 
-//Initiate Broadcast
-var broadcaster = dgram.createSocket('udp4');
-broadcaster.bind(PORT, function Broadcast(){
+broadcaster.broadcast();
 
-  //configure broadcast
-  console.log('Initiating broadcast');
-  broadcaster.setTTL(broadcastTTL);
-  broadcaster.setBroadcast(1);
-  
-  //Begin broadcast interval
-  var broadcastInterval = setInterval (sendBroadcast , broadcastInterval );
-  
-  
-  //Listen for Response and kill broadcast if heard, begin file transfer
-  broadcaster.on('message', function (msg, envelope){
-    if (envelope.address !== thisIP && envelope.address !== '127.0.0.1'){
-      console.log('Broadcast answered by: '+ envelope.address);
-      killBroadcast();
-    }
-  });
-
-  //Set timeout to stop listening after var broadcastLife
-  var timeout = setTimeout(function(){
-    console.log('Broadcast Unanswered' );
-    killBroadcast();
-    process.exit(1);
-  }, broadcastLife);
-  
-  function sendBroadcast(){
-    broadcaster.send( broadcastMessage, 0, broadcastMessage.length, PORT, '255.255.255.255',function(err, bytes){
-      if (err) {console.log(err);};
-
-    });
-  };
-
-  //kill broadcast
-  function killBroadcast (){
-    clearInterval(broadcastInterval);
-    clearTimeout(timeout);
-    broadcaster.close();
-  };
-});
 
 
 
@@ -78,7 +37,7 @@ var server = netModule.createServer();
 server.on('connection', function(socketConnection){
   
   //----------Config-------------------------------
-  //Kill Socket after 5 second inactivity
+  //Kill Socket after 5 seconds inactivity
   socketConnection.setTimeout(10000, function(){
     console.log('Socket Timeout');
     socketConnection.destroy();
