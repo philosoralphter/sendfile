@@ -1,14 +1,16 @@
 #!/usr/bin/env node
+'use strict';
 var dgram = require('dgram');
 var netModule = require('net');
 var ip = require('ip');
 var fs = require('fs');
 
-var broadcaster = new require('./pairingService').Broadcaster();
+var pairingService = require('./pairingService');
 var constants = require('./constants');
 
+var broadcaster = new pairingService.Broadcaster();
 var thisIP = ip.address();
-var PORT = 7657;
+
 
 //Parse arguments
 var fileToSend = process.argv[2];
@@ -20,8 +22,11 @@ var authentication = process.argv[3];
 //-------------------
 //*************Broadcast intent and location   (UDP datagram socket)
 //---------------
+var broadcastMessage = new Buffer(fileName.toString());
 
-broadcaster.broadcast();
+
+
+broadcaster.initiateBroadcast(function(){}, thisIP, broadcastMessage);
 
 
 
@@ -74,8 +79,8 @@ server.on('connection', function(socketConnection){
 });
 
   //----------------Start Server
-  server.listen(PORT, thisIP, function(){
-    console.log('Initiating server. Listening on PORT: '+PORT+' at address: '+ thisIP)
+  server.listen(constants.PORT, thisIP, function(){
+    console.log('Initiating server. Listening on PORT: '+ constants.PORT +' at address: '+ thisIP)
   }); 
 
 
