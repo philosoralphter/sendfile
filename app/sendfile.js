@@ -4,8 +4,8 @@ var netModule = require('net');
 var ip = require('ip');
 var fs = require('fs');
 
-var pairingService = require('./pairingService');
 var constants = require('./constants');
+var pairingService = require('./pairingService');
 
 var broadcaster = new pairingService.Broadcaster();
 var thisIP = ip.address();
@@ -23,10 +23,7 @@ var authentication = process.argv[3];
 //---------------
 var broadcastMessage = new Buffer(fileName.toString());
 
-
-
 broadcaster.initiateBroadcast(function(){}, thisIP, broadcastMessage);
-
 
 
 
