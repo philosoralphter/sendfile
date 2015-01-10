@@ -1,9 +1,9 @@
 module.exports.Broadcaster = Broadcaster;
 module.exports.BroadcastListener = BroadcastListener;
 
+var dgram = require('dgram');
 var constants = require('./constants');
 
-var broadcastMessage = new Buffer(fileName.toString());
 
 
 
@@ -14,13 +14,13 @@ var broadcastMessage = new Buffer(fileName.toString());
 function Broadcaster(){
   
   //Initiate Broadcast
-  this.initiateBroadcast = function (broadcastResponseHandler, broadcastMessage){
+  this.initiateBroadcast = function (broadcastResponseHandler, thisIP, broadcastMessage){
     var broadcaster = dgram.createSocket('udp4');
-    broadcaster.bind(PORT, function initiateBroadcast(){
+    broadcaster.bind(constants.PORT, function initiateBroadcast(){
 
       //configure broadcast
       console.log('Initiating broadcast');
-      broadcaster.setTTL(cosntants.BROADCAST_TTL);
+      broadcaster.setTTL(constants.BROADCAST_TTL);
       broadcaster.setBroadcast(1);
       
       //Begin broadcasting interval
@@ -43,7 +43,7 @@ function Broadcaster(){
       }, constants.BROADCAST_LIFE);
       
       function sendBroadcast(){
-        broadcaster.send( broadcastMessage, 0, broadcastMessage.length, PORT, '255.255.255.255', function(err, bytes){
+        broadcaster.send( broadcastMessage, 0, broadcastMessage.length, constants.PORT, '255.255.255.255', function(err, bytes){
           if (err) {console.log('Error broadcasting: ', err);};
         } );
       };
@@ -61,51 +61,55 @@ function Broadcaster(){
 }
 
 
-//-----------
+//----------------
 //*************Broadcast Listener
 //----------------
+
 function BroadcastListener(){
-  //begin listening
-  this.antennaSocket = dgram.createSocket('udp4');
-  antennaSocket.bind(PORT, function listening (){
 
-    console.log('Listening for host Broadcast...');
+  this.listenForBroadcast = function(){
+    //begin listening
+    var antennaSocket = dgram.createSocket('udp4');
+    antennaSocket.bind(PORT, function listening (){
 
-    //Configure antenna
-    antennaSocket.on('error', function (err){
-      console.log('Failed to bind to broadcast socket');
-      antennaSocket.close();
-      throw err;
+      console.log('Listening for host Broadcast...');
+
+      //Configure antenna
+      antennaSocket.on('error', function (err){
+        console.log('Failed to bind to broadcast socket');
+        antennaSocket.close();
+        throw err;
+      });
+
+      antennaSocket.on('message', function (msg, envelope){
+        hostIP = envelope.address;
+        fileName = msg.toString();
+
+        //send Response
+        var response = new Buffer('Client Receiving');
+        antennaSocket.send(response, 0, response.length, PORT, hostIP);
+
+        console.log('Receiving Broadcast from: ', hostIP);
+        antennaSocket.close();
+        clearTimeout(timeout);
+
+        console.log('Connecting to '+hostIP+' to get file:', fileName);
+        setTimeout(beginTransfer, 2000);
+      });
+
+      //stop listening after 10 seconds 
+      var timeout = setTimeout(function(){
+        console.log( 'No Broadcast detected.' );
+        killAntenna();
+        process.exit(1);
+      }, antennaLife);
+
+      killAntenna = function (){
+        clearTimeout(timeout);
+        process.exit(1);
+      };
     });
-
-    antennaSocket.on('message', function (msg, envelope){
-      hostIP = envelope.address;
-      fileName = msg.toString();
-
-      //send Response
-      var response = new Buffer('Client Receiving');
-      antennaSocket.send(response, 0, response.length, PORT, hostIP);
-
-      console.log('Receiving Broadcast from: ', hostIP);
-      antennaSocket.close();
-      clearTimeout(timeout);
-
-      console.log('Connecting to '+hostIP+' to get file:', fileName);
-      setTimeout(beginTransfer, 2000);
-    });
-
-    //stop listening after 10 seconds 
-    var timeout = setTimeout(function(){
-      console.log( 'No Broadcast detected.' );
-      killAntenna();
-      process.exit(1);
-    }, antennaLife);
-
-    killAntenna = function (){
-      clearTimeout(timeout);
-      process.exit(1);
-    };
-  });
+  };
 }
 
 
