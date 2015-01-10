@@ -1,7 +1,6 @@
 #!/usr/bin/env node
 'useStrict';
 var netModule = require('net');  //for streaming socket
-var dgram = require('dgram');   //for broadcast
 var ip = require('ip');  //ip utility
 var fs = require('fs');
 

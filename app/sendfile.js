@@ -1,6 +1,5 @@
 #!/usr/bin/env node
 'use strict';
-var dgram = require('dgram');
 var netModule = require('net');
 var ip = require('ip');
 var fs = require('fs');
