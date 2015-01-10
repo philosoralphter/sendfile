@@ -16,6 +16,8 @@ function Broadcaster(){
   //Initiate Broadcast
   this.initiateBroadcast = function (broadcastResponseHandler, thisIP, broadcastMessage){
     var broadcaster = dgram.createSocket('udp4');
+    var destinationIP;
+
     broadcaster.bind(constants.PORT, function initiateBroadcast(){
 
       //configure broadcast
@@ -31,6 +33,7 @@ function Broadcaster(){
       broadcaster.on('message', function (msg, envelope){
         if (envelope.address !== thisIP && envelope.address !== '127.0.0.1'){
           console.log('Broadcast answered by: '+ envelope.address);
+          destinationIP = envelope.address;
           killBroadcast();
         }
       });
@@ -54,7 +57,7 @@ function Broadcaster(){
         clearTimeout(timeout);
         broadcaster.close();
         //callback
-        broadcastResponseHandler();
+        broadcastResponseHandler(destinationIP);
       };
     });
   }
