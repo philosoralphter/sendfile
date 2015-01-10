@@ -45,8 +45,6 @@ function beginTransfer() {
 
     socketConnection.write('Client at: '+ thisIP + ' confirms connection.');
     
-    //--------------Authentication---------------------------
-
 
     //-----------Receive data and write to file in current directory-------------
     var writeStream = fs.createWriteStream(process.cwd() + '/' + fileName);
