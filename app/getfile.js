@@ -16,12 +16,13 @@ var fileName;
 //*************Listen for broadcast  (udp datagram )
 //----------------
 
-broadcastListener.listenForBroadcast(function(receivedHostIP, receivedFileName){
+broadcastListener.listenForBroadcast(handshakeMadeHandler, thisIP);
+
+function handshakeMadeHandler(receivedHostIP, receivedFileName){
   hostIP = receivedHostIP;
   fileName = receivedFileName;
   setTimeout(beginTransfer, 2000);
-}, thisIP);
-
+}
 
 
 
