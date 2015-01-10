@@ -67,10 +67,10 @@ function Broadcaster(){
 
 function BroadcastListener(){
 
-  this.listenForBroadcast = function(){
+  this.listenForBroadcast = function(handshakeCompleteHandler, thisIP){
     //begin listening
     var antennaSocket = dgram.createSocket('udp4');
-    antennaSocket.bind(PORT, function listening (){
+    antennaSocket.bind(constants.PORT, function listening (){
 
       console.log('Listening for host Broadcast...');
 
@@ -82,19 +82,21 @@ function BroadcastListener(){
       });
 
       antennaSocket.on('message', function (msg, envelope){
-        hostIP = envelope.address;
-        fileName = msg.toString();
+        var hostIP = envelope.address;
+        var fileName = msg.toString();
+
+        console.log('Receiving Broadcast from: ', hostIP);
+        
 
         //send Response
         var response = new Buffer('Client Receiving');
-        antennaSocket.send(response, 0, response.length, PORT, hostIP);
+        antennaSocket.send(response, 0, response.length, constants.PORT, hostIP);
 
-        console.log('Receiving Broadcast from: ', hostIP);
-        antennaSocket.close();
-        clearTimeout(timeout);
+        killAntenna();
 
-        console.log('Connecting to '+hostIP+' to get file:', fileName);
-        setTimeout(beginTransfer, 2000);
+        console.log('Connecting to ' + hostIP + ' to get file:', fileName);
+
+        handshakeCompleteHandler(hostIP, fileName);
       });
 
       //stop listening after 10 seconds 
@@ -102,11 +104,11 @@ function BroadcastListener(){
         console.log( 'No Broadcast detected.' );
         killAntenna();
         process.exit(1);
-      }, antennaLife);
+      }, constants.BROADCAST_LISTENER_ANTENNA_LIFE);
 
       killAntenna = function (){
         clearTimeout(timeout);
-        process.exit(1);
+        antennaSocket.close();
       };
     });
   };

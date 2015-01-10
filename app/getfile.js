@@ -1,21 +1,28 @@
 #!/usr/bin/env node
-'useStrict';
+'use strict';
 var netModule = require('net');  //for streaming socket
 var ip = require('ip');  //ip utility
 var fs = require('fs');
 
-var broadcastListener = new require('./pairingService').BroadcasterListener();
 var constants = require('./constants');
+var pairingService = require('./pairingService');
 
+var broadcastListener = new pairingService.BroadcastListener();
 var thisIP = ip.address();
 var hostIP;
-var PORT = 7657;
-
 var fileName;
 
 //-----------
 //*************Listen for broadcast  (udp datagram )
 //----------------
+
+broadcastListener.listenForBroadcast(function(receivedHostIP, receivedFileName){
+  hostIP = receivedHostIP;
+  fileName = receivedFileName;
+  setTimeout(beginTransfer, 2000);
+}, thisIP);
+
+
 
 
 //-----------
@@ -26,7 +33,7 @@ function beginTransfer() {
 
   var socketConnection = new netModule.Socket();
 
-  socketConnection.connect(PORT, hostIP, function connected(){
+  socketConnection.connect(constants.PORT, hostIP, function connected(){
     //----------Config and handshake-------------------------------
     //Kill Socket after 5 seconds inactivity
     socketConnection.setTimeout(10000, function(){
