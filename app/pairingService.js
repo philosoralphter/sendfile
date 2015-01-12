@@ -71,7 +71,7 @@ function Broadcaster(){
 
 function BroadcastListener(){
 
-  this.listenForBroadcast = function(callback, thisIP){
+  this.listenForBroadcast = function(thisIP, callback){
     //begin listening
     var antennaSocket = dgram.createSocket('udp4');
     antennaSocket.bind(constants.PORT, function listening (){

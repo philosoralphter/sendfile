@@ -18,7 +18,7 @@ var fileName;
 //*************Listen for broadcast  (udp datagram )
 //----------------
 
-broadcastListener.listenForBroadcast(handshakeMadeHandler, thisIP);
+broadcastListener.listenForBroadcast(thisIP, handshakeMadeHandler);
 
 function handshakeMadeHandler(receivedHostIP, receivedFileName){
   hostIP = receivedHostIP;

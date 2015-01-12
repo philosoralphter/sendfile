@@ -1,6 +1,6 @@
 {
   "name": "sendfile",
-  "version": "0.0.2",
+  "version": "0.1.0",
   "description": "zero-config CLI for sending files",
   "main": "index.js",
   "preferGlobal": "true",
