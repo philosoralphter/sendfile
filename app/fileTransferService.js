@@ -7,17 +7,12 @@ var fs = require('fs');
 var constants = require('./constants');
 
 
-function FileReceiver(){
-
-}
-
-
 //----------
 //************File Sender**********************  (TCP Socket)
 //-----------------------
 function FileSender(){
 
-  this.transferFile = function(callback, fileToSend, thisIP, destinationIP){    
+  this.transferFile = function(fileToSend, thisIP, destinationIP, callback){    
     
     var server = netModule.createServer();
     var socket;
@@ -36,21 +31,23 @@ function FileSender(){
     server.listen(constants.PORT, thisIP, function(){
       console.log('Initiating server. Listening on PORT: '+ constants.PORT +' at address: '+ thisIP)
     }); 
+    setTimeout(function(){server.close();}, 8000);
 
 
     //-----------------Helper functions
+    //--------------------------------------------
     function configureSocket(){
       //Kill Socket after 10 seconds inactivity
       socket.setTimeout(constants.SOCKET_TTL, function(){
         console.log('Socket Timeout');
         socketConnection.destroy();
-        process.exit(1);
+        callback(1);
       });
 
       //Log disconnections
       socket.on('close', function() {
         console.log('Server disconnected from client.');
-        process.exit(0);
+        callback(0);
       });
 
       //Receive client messages on 'data' events
@@ -84,8 +81,48 @@ function FileSender(){
         console.log('File Sent');
         socket.end();
         socket.destroy();
-        process.exit(0);
+        callback(0);
       });
     }
   }
+}
+
+
+//----------
+//************File Receiver**********************  (TCP Socket)
+//-----------------------
+function FileReceiver(){
+  this.beginTransfer = function(hostIP, thisIP, fileName, callback) {
+
+    var socketConnection = new netModule.Socket();
+    socketConnection.on('error', function(err){console.log('Error in file transfer socket on receiving end: ', err);});
+
+    socketConnection.connect(constants.PORT, hostIP, function connected(){
+      //----------Config and handshake-------------------------------
+      //Kill Socket after 5 seconds inactivity
+      socketConnection.setTimeout(10000, function(){
+        console.log('Socket Timeout');
+        socketConnection.destroy();
+        callback(1);
+      });
+
+      socketConnection.write('Client at: '+ thisIP + ' confirms connection.');
+      
+
+      //-----------Receive data and write to file in current directory-------------
+      var writeStream = fs.createWriteStream(process.cwd() + '/' + fileName);
+      socketConnection.on('data', function(chunk){
+        writeStream.write(chunk);
+      });
+
+      socketConnection.on('end', function(){
+        console.log('File Received');
+        console.log('Closing Connection');
+        writeStream.end();
+        socketConnection.destroy();
+        callback(0);
+      });
+
+    });
+  };
 }
