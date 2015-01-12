@@ -26,22 +26,26 @@ var broadcastMessage = new Buffer(fileName.toString());
 //*************Broadcast intent and location   (UDP datagram socket)
 //---------------
 
-broadcaster.initiateBroadcast(function (passedDestinationIP){
-  destinationIP = passedDestinationIP;
-}, thisIP, broadcastMessage);
+broadcaster.initiateBroadcast(thisIP, broadcastMessage, broadcastResponseHandler);
 
-
+function broadcastResponseHandler(exitStatus, passedDestinationIP){
+  if (exitStatus !== 0){
+    process.exit(exitStatus);
+  }else{
+    destinationIP = passedDestinationIP;
+    transferFile();
+  }
+}
 
 
 
 //----------
 //************File Server**********************  (TCP Socket)
 //-----------------------
-console.log('-------------', destinationIP);
-fileServer.transferFile(function(){}, fileToSend, thisIP, destinationIP);
+function transferFile(){
+  fileServer.transferFile(fileToSend, thisIP, destinationIP, transferFinishedHandler);
+}
 
-
-
-
-
-
+function transferFinishedHandler(exitStatus){
+  process.exit(exitStatus);
+}
