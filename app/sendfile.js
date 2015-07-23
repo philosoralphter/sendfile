@@ -1,25 +1,50 @@
 #!/usr/bin/env node
 'use strict';
 
+var fs = require('fs');
 var ip = require('ip');
+var parseArgs = require('minimist');
+var prompt = require('prompt');
 
 var constants = require('./../constants');
+var utils = require('../util/convenienceUtilities.js');
 var pairingService = require('./../lib/pairingService');
 var fileTransferService = require('./../lib/fileTransferService');
-
 var broadcaster = new pairingService.Broadcaster();
 var fileServer = new fileTransferService.FileSender();
+
+
 var thisIP = ip.address();
 var destinationIP;
+var fileInputPath, fileResolvedPath, fileName;
+var argv;
 
-
+//-----------------
 //Parse arguments
-var fileToSend = process.argv[2];
-var fileNameRegex = /[^/]+$/;
-var fileName = fileToSend.match(fileNameRegex)[0];
-var authentication = process.argv[3];
+//---------------
+argv = parseArgs(process.argv, {
 
-var broadcastMessage = new Buffer(fileName.toString());
+});
+
+//Respond to HALP!
+if (argv.h || argv.help || argv._.length() > 1 || utils.containsString(argv._, 'help')) {
+    displayHelp();
+    process.exit(0);
+}
+
+//Resolve file, verify exists
+fileInputPath = argv._[0] || argv.f || argv.file;
+try {
+    fileResolvedPath = fs.realpathSync(fileInputPath);
+}
+catch (e) {
+    console.log('Could not resolve file path.  Does it Exist?\n\t`$ sendfile help` for help');
+    process.exit(1);
+}
+fileName = fileResolvedPath.match(utils.fileNameRegex)[0];
+
+
+
 
 
 //-------------------
