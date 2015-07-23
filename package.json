@@ -25,6 +25,8 @@
   },
   "homepage": "https://github.com/philosoralphter/sendfile",
   "dependencies": {
-    "ip": "^0.3.2"
+    "ip": "^0.3.2",
+    "minimist": "^1.1.2",
+    "prompt": "^0.2.14"
   }
 }
