@@ -6,7 +6,7 @@ var fs = require('fs');
 
 var constants = require('./../constants');
 var pairingService = require('./pairingService');
-var fileTransferService = require('./fileTransferService');
+var fileTransferService = require('./../lib/fileTransferService');
 
 var broadcastListener = new pairingService.BroadcastListener();
 var fileReceiverClient = new fileTransferService.FileReceiver();

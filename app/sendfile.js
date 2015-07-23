@@ -5,7 +5,7 @@ var ip = require('ip');
 
 var constants = require('./../constants');
 var pairingService = require('./pairingService');
-var fileTransferService = require('./fileTransferService');
+var fileTransferService = require('./../lib/fileTransferService');
 
 var broadcaster = new pairingService.Broadcaster();
 var fileServer = new fileTransferService.FileSender();
