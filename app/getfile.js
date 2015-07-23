@@ -4,7 +4,7 @@ var netModule = require('net');  //for streaming socket
 var ip = require('ip');  //ip utility
 var fs = require('fs');
 
-var constants = require('./constants');
+var constants = require('./../constants');
 var pairingService = require('./pairingService');
 var fileTransferService = require('./fileTransferService');
 

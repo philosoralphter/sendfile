@@ -3,7 +3,7 @@
 
 var ip = require('ip');
 
-var constants = require('./constants');
+var constants = require('./../constants');
 var pairingService = require('./pairingService');
 var fileTransferService = require('./fileTransferService');
 

@@ -2,7 +2,7 @@ module.exports.Broadcaster = Broadcaster;
 module.exports.BroadcastListener = BroadcastListener;
 
 var dgram = require('dgram');
-var constants = require('./constants');
+var constants = require('./../constants');
 
 
 
@@ -12,7 +12,7 @@ var constants = require('./constants');
 //---------------
 
 function Broadcaster(){
-  
+
   //Initiate Broadcast
   this.initiateBroadcast = function (thisIP, broadcastMessage, callback){
     var broadcaster = dgram.createSocket('udp4');
@@ -24,11 +24,11 @@ function Broadcaster(){
       console.log('Initiating broadcast');
       broadcaster.setTTL(constants.BROADCAST_TTL);
       broadcaster.setBroadcast(1);
-      
+
       //Begin broadcasting interval
       var broadcastingInterval = setInterval ( sendBroadcast, constants.BROADCAST_INTERVAL );
-      
-      
+
+
       //Listen for Response and kill broadcast if heard, begin file transfer
       broadcaster.on('message', function (msg, envelope){
         if (msg.toString() === 'Client Receiving'){
@@ -43,7 +43,7 @@ function Broadcaster(){
         console.log('Broadcast Unanswered' );
         killBroadcast(1);
       }, constants.BROADCAST_LIFE);
-      
+
       function sendBroadcast(){
         broadcaster.send( broadcastMessage, 0, broadcastMessage.length, constants.PORT, '255.255.255.255', function(err, bytes){
           if (err) {
@@ -104,14 +104,14 @@ function BroadcastListener(){
 
       });
 
-      //stop listening after 10 seconds 
+      //stop listening after 10 seconds
       var timeout = setTimeout(function(){
         console.log( 'No Broadcast detected.' );
         killAntenna();
         process.exit(1);
       }, constants.BROADCAST_LISTENER_ANTENNA_LIFE);
 
-      killAntenna = function (){
+      function killAntenna(){
         clearTimeout(timeout);
         antennaSocket.close();
       };

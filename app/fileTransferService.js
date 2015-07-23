@@ -4,7 +4,7 @@ module.exports.FileReceiver = FileReceiver;
 var netModule = require('net');
 var fs = require('fs');
 
-var constants = require('./constants');
+var constants = require('./../constants');
 
 
 //----------
@@ -12,8 +12,8 @@ var constants = require('./constants');
 //-----------------------
 function FileSender(){
 
-  this.transferFile = function(fileToSend, thisIP, destinationIP, callback){    
-    
+  this.transferFile = function(fileToSend, thisIP, destinationIP, callback){
+
     var server = netModule.createServer();
     var socket;
 
@@ -30,7 +30,7 @@ function FileSender(){
     //----------------Start Server
     server.listen(constants.PORT, thisIP, function(){
       console.log('Initiating server. Listening on PORT: '+ constants.PORT +' at address: '+ thisIP)
-    }); 
+    });
     setTimeout(function(){server.close();}, 8000);
 
 
@@ -55,13 +55,13 @@ function FileSender(){
         console.log(chunk.toString());
       });
       //begin sending file after first data event
-      socket.once('data', sendFile);    
+      socket.once('data', sendFile);
     }
 
     function vetClientIP(){
       if (socket.remoteAddress !== destinationIP){
-        console.log('Wrong client connected to socket.  Expected connection from: ' 
-                    + destinationIP + ' but connection made by: ' 
+        console.log('Wrong client connected to socket.  Expected connection from: '
+                    + destinationIP + ' but connection made by: '
                     + socket.remoteAddress);
         process.exit(2);
       }else{
@@ -70,13 +70,13 @@ function FileSender(){
       }
     }
 
-    function sendFile(){  
+    function sendFile(){
       var readFile = fs.createReadStream(fileToSend);
-      
+
       readFile.on('data', function(chunk){
         socket.write(chunk);
       });
-      
+
       readFile.on('end', function(){
         console.log('File Sent');
         socket.end();
@@ -107,7 +107,7 @@ function FileReceiver(){
       });
 
       socketConnection.write('Client at: '+ thisIP + ' confirms connection.');
-      
+
 
       //-----------Receive data and write to file in current directory-------------
       var writeStream = fs.createWriteStream(process.cwd() + '/' + fileName);
